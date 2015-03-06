@@ -1,0 +1,28 @@
+Powerpoint:
+- Non-technical simple start
+  - Description of the tool
+    - Screenshots
+      - Housing.ma
+      - Regional indicators
+      - Map
+    - What problem it solves, what we made it
+      - D3 is a powerful tool, but it's very low level
+      - Tufted generalizes common charts and makes them reusable and extensible
+        - Mike Bostock article on reusability
+      - making PDF data interactive
+        - Projections page
+      - New York Times, Urban Institute - weaving narrative with visualization on the web
+        - difficult data management, application development problem
+
+FiddleJS:
+  - Prepare simple CartoDB datasets
+    - tabular
+    - then map
+    - then complex visualizations
+  - Show colors, callouts, other options
+  - Extensibility examples
+    - Preserves D3 selections
+
+Next steps:
+  - Tufted API
+  - Integrating C3 code, approach
