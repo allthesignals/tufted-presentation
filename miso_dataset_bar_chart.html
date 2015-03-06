@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<style>
+@import url(http://fonts.googleapis.com/css?family=Droid+Serif);
+@import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+body {
+  font-family: 'Droid Serif';
+  font-size: 20px;
+}
+h1, h2, h3 {
+  font-family: 'Yanone Kaffeesatz';
+  font-weight: 400;
+  margin: 0;
+}
+h1 { font-size: 4em; }
+h2 { font-size: 2em; }
+h3 { font-size: 1.6em; }
+.bar {
+  fill: steelblue;
+}
+
+.bar:hover {
+  fill: brown;
+}
+
+.axis {
+  font-size: 14px;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+</style>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<h1>Count of Vehicles by Type</h1>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="miso.ds.deps.ie.0.4.1.js" charset="utf-8"></script>
+<script>
+var data = [{"name": "Cars"	, "value": 8737081}, 
+						{"name": "Trucks"	, "value": 1801551}, 
+						{"name": "SUVs"	, "value": 3499923}, 
+						{"name": "Wagons"	, "value": 727},
+						{"name": "Vans"	, "value": 1280060}]
+
+var margin = {top: 20, right: 20, bottom: 30, left: 80},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var ds = new Miso.Dataset({
+  importer : Miso.Dataset.Importers.GoogleSpreadsheet,
+  parser : Miso.Dataset.Parsers.GoogleSpreadsheet,
+  key: "0AhkLvVMCbhKwdHREVGs0Z09TRy1NYUJIZXRhX0I1Ync",
+  worksheet: "1"
+});
+
+
+ds.fetch({
+	success: function () {
+
+		var data = [];
+		
+		this.each(function(row, rowIndex){ 
+			data.push(row); 
+		});
+
+		console.log(data)
+
+		x.domain(data.map(function(d) { return d.type; }));
+	  y.domain([0, d3.max(data, function(d) { return d.count; })]);
+
+	  svg.append("g")
+	      .attr("class", "x axis")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(xAxis);
+
+	  svg.append("g")
+	      .attr("class", "y axis")
+	      .call(yAxis)
+	    .append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Count");
+
+	  svg.selectAll(".bar")
+	      .data(data)
+	    .enter().append("rect")
+	      .attr("class", "bar")
+	      .attr("x", function(d) { return x(d.type); })
+	      .attr("width", x.rangeBand())
+	      .attr("y", function(d) { return y(d.count); })
+	      .attr("height", function(d) { return height - y(d.count); });
+
+	},
+
+	error: function() {
+		console.log("Are you connected to the internet?")
+	}
+
+});
+
+
+</script>
+	
+</body>
+</html>
