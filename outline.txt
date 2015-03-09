@@ -6,6 +6,7 @@ Powerpoint:
       - Regional indicators
       - Map
     - What problem it solves, what we made it
+
       - D3 is a powerful tool, but it's very low level
       - Tufted generalizes common charts and makes them reusable and extensible
         - Mike Bostock article on reusability
@@ -26,3 +27,11 @@ FiddleJS:
 Next steps:
   - Tufted API
   - Integrating C3 code, approach
+
+
+  Notes: 
+  Reusability:
+   1. A chart can be instantiated more than once in a given context, each visualizing a different data set.
+   2. Chart definitions (source code) can be easily re-factored by other developers to suit their needs.
+   3. Chart behavior can be altered at run-time through a consistent API.
+   4. New charts can be defined in terms of existing charts.
