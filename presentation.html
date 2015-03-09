@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>D3 + Miso.Dataset</title>
+    <title>Tufted</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
       @import url(http://fonts.googleapis.com/css?family=Droid+Serif);
@@ -29,6 +29,9 @@
       a, a > code {
         color: rgb(249, 38, 114);
         text-decoration: none;
+      }
+      .bold {
+        font-weight: bold;
       }
       code {
         -moz-border-radius: 5px;
@@ -99,7 +102,9 @@
         background: #fff;
         z-index: 0;
       }
-
+      .small {
+        font-size: .01em;
+      }
       /* Two-column layout */
       .left-column {
         color: #777;
@@ -115,6 +120,10 @@
         float: right;
         padding-top: 1em;
       }
+
+      .fill img {
+        max-width: 100%;
+      }
     </style>
   </head>
   <body>
@@ -126,78 +135,208 @@ class: center, middle, inverse
 
 ---
 
-# Introduction to D3
-# + Miso.Dataset
+# Introduction to Tufted
+
+---
+
+layout: false
+.left-column[
+# What's Tufted?
+]
+--
+.right-column[
+- .bold[Collection] of templates for common D3 charts
+]
+--
+.right-column[
+- .bold[Creates] a bridge across existing projects
+]
+--
+.right-column[
+- .bold[Introduces] reusability and extensibility
+]
+
+---
+
+layout: false
+background-image: url(https://s3.amazonaws.com/wmgardner.co/tufted-presentation/Screen+Shot+2015-03-09+at+10.29.59+AM.png)
+
+# Regional indicators
+
+---
+
+layout: false
+background-image: url(https://s3.amazonaws.com/wmgardner.co/tufted-presentation/Screen+Shot+2015-03-09+at+10.29.03+AM.png)
+
+# Regional indicators
+
+---
+
+layout: false
+background-image: url(https://s3.amazonaws.com/wmgardner.co/tufted-presentation/Screen+Shot+2015-03-09+at+10.30.43+AM.png)
+
+# Housing.ma
+
+---
+
+layout: false
+
+# Why?
 
 ---
 
 template: inverse
-# What's D3?
+
+## D3 is powerful, but abstract. 
+## Code can become verbose and difficult to reuse.
 
 ---
-
-layout: false
-# D3 abstracts
-
-1. Harder to learn
-2. But very powerful!
-
----
-layout: false
-
-#Data Driven Documents
-
-## Great for "learning the web"
-
-1. Hypertext Markup Language
-2. Cascading Style Sheets
-3. Javascript
-4. Scalable Vector Graphics
-5. The Document Object Model
-
----
-layout: false
-.left-column[
-  ## Basic Structure
-
-]
-.right-column[
-
-Place the D3 library inside your document
-
-```xml
-  <!doctype html>
-  <html lang="en">
-  <head>
-    <style>
-    /* styles! */
-    </style>
-    <meta charset="UTF-8">
-    <title>My D3</title>
-  </head>
-  <body>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8">
-    // D3 goes here!
-    </script>
-    
-  </body>
-  </html>
-```
-]
----
-layout: false
-.left-column[
-## Javascript arrays
-
-]
-.right-column[
-
-
+template: inverse
+## Bar chart
 
 ```javascript
-var dataset = [ 5, 10, 13, 30, 50 ];
-``` 
+var n = 4, // number of layers
+    m = 58, // number of samples per layer
+    stack = d3.layout.stack(),
+    layers = stack(d3.range(n).map(function() { return bumpLayer(m, .1); })),
+    yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
+    yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+
+var margin = {top: 40, right: 10, bottom: 20, left: 10},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .domain(d3.range(m))
+    .rangeRoundBands([0, width], .08);
+
+var y = d3.scale.linear()
+    .domain([0, yStackMax])
+    .range([height, 0]);
+
+var color = d3.scale.linear()
+    .domain([0, n - 1])
+    .range(["#aad", "#556"]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .tickSize(0)
+    .tickPadding(6)
+    .orient("bottom");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var layer = svg.selectAll(".layer")
+    .data(layers)
+  .enter().append("g")
+    .attr("class", "layer")
+    .style("fill", function(d, i) { return color(i); });
+
+var rect = layer.selectAll("rect")
+    .data(function(d) { return d; })
+  .enter().append("rect")
+    .attr("x", function(d) { return x(d.x); })
+    .attr("y", height)
+    .attr("width", x.rangeBand())
+    .attr("height", 0);
+
+rect.transition()
+    .delay(function(d, i) { return i * 10; })
+    .attr("y", function(d) { return y(d.y0 + d.y); })
+    .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); });
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+d3.selectAll("input").on("change", change);
+...
+
+```
+
+---
+layout: false
+
+.left-column[ 
+Principles of reusability:
 ]
+
+--
+.right-column[
+.bold[Repeatable]:
+
+A chart can be instantiated more than once in a given context, each visualizing a different data set.
+]
+
+--
+.right-column[
+.bold[Modifiable]:
+
+Chart definitions (source code) can be easily re-factored by other developers to suit their needs.
+]
+--
+.right-column[
+.bold[Configurable]:
+
+Chart behavior can be altered at run-time through a consistent API.
+]
+--
+.right-column[
+.bold[Extensible]:
+
+New charts can be defined in terms of existing charts.
+]
+
+---
+layout: false
+
+.left-column[
+  ## Basic Structure
+]
+
+.right-column[
+
+Tufted generalizes a Bar Chart while preserving its internal selections.
+
+```javascript
+  var chart = d3.select("body")
+  .append('svg')
+  .chart('GroupedBarChart')
+  .height(400)
+  .colors(['#1F77B4', '#1C164E']);
+
+  d3.json(url, function(d) {
+     chart.draw((d.rows));
+  });
+```
+]
+
+--
+
+.right-column[
+.fill[![Grouped Bar Chart](https://s3.amazonaws.com/wmgardner.co/tufted-presentation/Screen+Shot+2015-03-09+at+12.20.54+PM.png)]
+]
+
+---
+layout: false
+.left-column[
+## Weave narrative with visualizations
+
+]
+--
+.right-column[
+.fill[![Grouped Bar Chart](https://s3.amazonaws.com/wmgardner.co/tufted-presentation/Screen+Shot+2015-03-09+at+12.31.03+PM.png)]
+]
+--
+.right-column[
+.fill[![Grouped Bar Chart](https://s3.amazonaws.com/wmgardner.co/tufted-presentation/Screen+Shot+2015-03-09+at+12.31.22+PM.png)]
+]
+
 
 ---
 
